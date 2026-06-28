@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(100)
+  email     String   @unique @db.VarChar(255)
+  password  String   @db.VarChar(255)
+  role      Role     @default(USER)
+  credits   Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  transactions    Transaction[]
+  createdVouchers Voucher[]           @relation("CreatedBy")
+  redemptions     VoucherRedemption[]
+  envatoAccess    EnvatoAccess[]
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model Transaction {
+  id          Int             @id @default(autoincrement())
+  userId      Int             @map("user_id")
+  service     String          @db.VarChar(50)
+  type        TransactionType
+  amount      Int
+  description String?         @db.VarChar(255)
+  metadata    Json?
+  createdAt   DateTime        @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("transactions")
+}
+
+enum TransactionType {
+  CREDIT
+  DEBIT
+}
+
+model Voucher {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique @db.VarChar(50)
+  amount      Int
+  isUsed      Boolean  @default(false) @map("is_used")
+  createdById Int      @map("created_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  createdBy  User               @relation("CreatedBy", fields: [createdById], references: [id])
+  redemption VoucherRedemption?
+
+  @@map("vouchers")
+}
+
+model EnvatoAccess {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @map("user_id")
+  packageId    String   @db.VarChar(20) @map("package_id")
+  filesTotal   Int      @map("files_total")
+  filesUsed    Int      @default(0) @map("files_used")
+  expiresAt    DateTime @map("expires_at")
+  purchasedAt  DateTime @default(now()) @map("purchased_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("envato_access")
+}
+
+model InboxEmail {
+  id        String   @id @db.VarChar(255)
+  subject   String?  @db.VarChar(500)
+  sender    String?  @db.VarChar(500)
+  recipient String   @db.VarChar(255)
+  body      String?  @db.Text
+  bodyHtml  String?  @db.LongText @map("body_html")
+  timestamp Int
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([recipient])
+  @@map("inbox_emails")
+}
+
+model VoucherRedemption {
+  id         Int      @id @default(autoincrement())
+  voucherId  Int      @unique @map("voucher_id")
+  userId     Int      @map("user_id")
+  redeemedAt DateTime @default(now()) @map("redeemed_at")
+
+  voucher Voucher @relation(fields: [voucherId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@map("voucher_redemptions")
+}
