@@ -175,7 +175,6 @@ export default function InboxPage() {
                   </Alert>
                 )}
 
-                {/* Tutorial */}
                 <div className="rounded-lg bg-muted p-3 text-xs text-muted-foreground space-y-1.5">
                   <p className="font-medium text-foreground">Cara pakai:</p>
                   <ol className="space-y-1 list-decimal list-inside">
@@ -246,7 +245,6 @@ export default function InboxPage() {
             )}
           </div>
 
-          {/* Panel kanan */}
           <div className="flex flex-col gap-4">
             <Card>
               <CardHeader><CardTitle className="text-sm">Biaya Pencarian</CardTitle></CardHeader>

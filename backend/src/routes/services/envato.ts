@@ -7,11 +7,9 @@ const router = Router()
 router.use(authenticate)
 
 export const ENVATO_PACKAGES = [
-  // Lite — 10 file/hari
   { id: "lite-1d",  tier: "Lite", label: "1 Hari Lite",   days: 1,  filesPerDay: 10, files: 10,  price: 10_000 },
   { id: "lite-7d",  tier: "Lite", label: "1 Minggu Lite",  days: 7,  filesPerDay: 10, files: 70,  price: 15_000 },
   { id: "lite-30d", tier: "Lite", label: "1 Bulan Lite",   days: 30, filesPerDay: 10, files: 300, price: 45_000 },
-  // Pro — 20 file/hari
   { id: "pro-1d",   tier: "Pro",  label: "1 Hari Pro",     days: 1,  filesPerDay: 20, files: 20,  price: 15_000 },
   { id: "pro-7d",   tier: "Pro",  label: "1 Minggu Pro",   days: 7,  filesPerDay: 20, files: 140, price: 25_000 },
   { id: "pro-30d",  tier: "Pro",  label: "1 Bulan Pro",    days: 30, filesPerDay: 20, files: 600, price: 65_000 },
@@ -39,12 +37,10 @@ async function getDownloadUrl(assetUrl: string): Promise<string> {
   const session = loadSession()
   if (!session) throw Object.assign(new Error("Session Envato belum diset."), { status: 503 })
 
-  // Extract item code dari URL (e.g. 5UY28VR dari /boron-admin-dashboard-template-5UY28VR)
   const itemCodeMatch = assetUrl.match(/[-\/]([A-Z0-9]{5,8})(?:\?|$)/i)
   const itemCode = itemCodeMatch?.[1] ?? ""
   if (!itemCode) throw new Error("Tidak bisa parse item code dari URL")
 
-  // Step 1: Dapat UUID via neue-download API (tidak perlu login)
   const ndRes = await fetchWithSession(
     `https://elements.envato.com/data-api/modal/neue-download?type=neue-download&itemId=${itemCode}&languageCode=en`
   )
@@ -54,7 +50,6 @@ async function getDownloadUrl(assetUrl: string): Promise<string> {
 
   if (!itemUuid) throw new Error(`Gagal dapat UUID item (itemCode=${itemCode}, status=${ndRes.status})`)
 
-  // Step 2: Dapat download URL dari app.envato.com
   const dlRes = await fetchWithSession(
     `https://app.envato.com/download.data?itemUuid=${itemUuid}&itemType=${itemType}&_routes=routes%2Fdownload%2Froute`,
     { headers: { "Referer": `https://app.envato.com/${itemType}/${itemUuid}` } }
@@ -62,7 +57,6 @@ async function getDownloadUrl(assetUrl: string): Promise<string> {
   const dlText = await dlRes.text()
   if (!dlRes.ok) throw new Error(`download.data gagal (${dlRes.status})`)
 
-  // Parse array response: [..., "downloadUrl", "https://..."]
   try {
     const arr = JSON.parse(dlText) as unknown[]
     for (let i = arr.length - 2; i >= 0; i--) {
@@ -76,7 +70,6 @@ async function getDownloadUrl(assetUrl: string): Promise<string> {
 }
 
 
-// GET /status
 router.get("/status", async (req: AuthRequest, res) => {
   const now = new Date()
   const access = await prisma.envatoAccess.findFirst({
@@ -94,12 +87,10 @@ router.get("/status", async (req: AuthRequest, res) => {
   })
 })
 
-// GET /packages
 router.get("/packages", (_req, res) => {
   res.json(ENVATO_PACKAGES)
 })
 
-// POST /buy
 router.post("/buy", async (req: AuthRequest, res) => {
   const { packageId } = req.body as { packageId?: PackageId }
   const pkg = ENVATO_PACKAGES.find((p) => p.id === packageId)
@@ -152,7 +143,6 @@ router.post("/buy", async (req: AuthRequest, res) => {
   }
 })
 
-// POST /download
 router.post("/download", async (req: AuthRequest, res) => {
   const { url } = req.body as { url?: string }
   if (!url?.trim()) { res.status(400).json({ error: "URL wajib diisi" }); return }
@@ -175,7 +165,6 @@ router.post("/download", async (req: AuthRequest, res) => {
   })()
 
   try {
-    // Kurangi kuota dulu (atomic)
     const quotaResult = await prisma.$transaction(async (tx) => {
       const now = new Date()
       const access = await tx.envatoAccess.findFirst({
@@ -200,12 +189,10 @@ router.post("/download", async (req: AuthRequest, res) => {
       return { filesRemaining: access.filesTotal - access.filesUsed - 1, expiresAt: access.expiresAt, accessId: access.id }
     })
 
-    // Ambil download URL dari Envato
     let downloadUrl: string
     try {
       downloadUrl = await getDownloadUrl(url.trim())
     } catch (fetchErr: any) {
-      // Rollback kuota jika gagal ambil file
       await prisma.envatoAccess.update({
         where: { id: quotaResult.accessId },
         data: { filesUsed: { decrement: 1 } },
@@ -213,13 +200,11 @@ router.post("/download", async (req: AuthRequest, res) => {
       throw fetchErr
     }
 
-    // Proxy file ke client
     const fileRes = await fetchWithSession(downloadUrl, { headers: { Accept: "*/*" } })
     if (!fileRes.ok || !fileRes.body) throw new Error(`Gagal download file dari Envato (${fileRes.status})`)
 
     const contentType = fileRes.headers.get("content-type") ?? "application/octet-stream"
 
-    // Ambil filename asli dari response-content-disposition query param di download URL
     let filename = assetTitle + ".zip"
     try {
       const dlUrlObj = new URL(downloadUrl)
@@ -229,7 +214,6 @@ router.post("/download", async (req: AuthRequest, res) => {
         const plainMatch = rcd.match(/filename="?([^";]+)"?/i)
         filename = utf8Match ? decodeURIComponent(utf8Match[1]) : plainMatch ? plainMatch[1] : filename
       } else {
-        // Fallback: pakai nama file dari path URL
         const pathFile = dlUrlObj.pathname.split("/").pop()
         if (pathFile) filename = decodeURIComponent(pathFile)
       }

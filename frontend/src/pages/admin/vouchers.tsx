@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react"
-import { Loader2, Trash2, Plus, RefreshCw, Copy, Check } from "lucide-react"
+import { Loader2, Trash2, Plus, Copy, Check, CheckCircle2 } from "lucide-react"
 import { api, type VoucherFull } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field"
 
 function CopyButton({ text }: { text: string }) {
@@ -36,6 +37,8 @@ export default function AdminVouchersPage() {
   const [customCode, setCustomCode] = useState("")
   const [creating, setCreating] = useState(false)
   const [createError, setCreateError] = useState("")
+  const [createdCode, setCreatedCode] = useState("")
+  const [showCreated, setShowCreated] = useState(false)
 
   async function load() {
     setLoading(true)
@@ -61,6 +64,8 @@ export default function AdminVouchersPage() {
       setOpen(false)
       setAmount("")
       setCustomCode("")
+      setCreatedCode(voucher.code)
+      setShowCreated(true)
     } catch (e) {
       setCreateError(e instanceof Error ? e.message : "Gagal membuat voucher")
     } finally {
@@ -81,14 +86,39 @@ export default function AdminVouchersPage() {
   if (error) return <p className="p-6 text-destructive">{error}</p>
 
   return (
-    <div className="p-6 space-y-6">
+    <>
+      <AlertDialog open={showCreated} onOpenChange={setShowCreated}>
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogMedia className="bg-green-500/10 text-green-600">
+              <CheckCircle2 />
+            </AlertDialogMedia>
+            <AlertDialogTitle>Voucher berhasil dibuat</AlertDialogTitle>
+            <AlertDialogDescription>
+              Kode voucher <strong className="font-mono tracking-widest">{createdCode}</strong> siap digunakan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="sm:justify-center">
+            <AlertDialogAction
+              onClick={() => {
+                navigator.clipboard.writeText(createdCode)
+                setShowCreated(false)
+              }}
+            >
+              <Copy className="size-4" />
+              Salin Kode
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+    <div className="flex flex-1 flex-col gap-6 p-6">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Voucher Redeem</h1>
-          <p className="text-muted-foreground text-sm">{vouchers.length} voucher dibuat</p>
+          <h2 className="font-heading text-lg font-semibold">Voucher Redeem</h2>
+          <p className="text-sm text-muted-foreground">{vouchers.length} voucher dibuat</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={load}><RefreshCw className="size-4" /></Button>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button size="sm"><Plus className="size-4 mr-1" />Buat Voucher</Button>
@@ -127,7 +157,8 @@ export default function AdminVouchersPage() {
         </div>
       </div>
 
-      <div className="rounded-lg border overflow-hidden">
+      <Card>
+        <CardContent className="p-0">
         <Table>
           <TableHeader>
             <TableRow>
@@ -183,7 +214,9 @@ export default function AdminVouchersPage() {
             ))}
           </TableBody>
         </Table>
-      </div>
+        </CardContent>
+      </Card>
     </div>
+    </>
   )
 }

@@ -100,7 +100,6 @@ export default function DownloaderPage(_: { serviceId: "envato" }) {
     setDoneFile("")
     try {
       const result = await api.services.envato.download(url.trim())
-      // Trigger browser download
       const objectUrl = URL.createObjectURL(result.blob)
       const a = document.createElement("a")
       a.href = objectUrl
@@ -135,44 +134,42 @@ export default function DownloaderPage(_: { serviceId: "envato" }) {
     <div className="flex flex-1 flex-col gap-6 p-6">
       <LowCreditAlert />
 
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div>
           <h2 className="font-heading text-lg font-semibold">Envato Elements</h2>
-          <p className="text-sm text-muted-foreground">Download template, musik, font, dan aset kreatif premium</p>
+          <p className="text-sm text-muted-foreground">Download template, musik, font, dan ribuan aset kreatif — bayar per file, tanpa subscribe bulanan</p>
         </div>
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1 sm:shrink-0">
           {["PSD", "AI", "AE", "MP3", "ZIP"].map((t) => (
             <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>
           ))}
         </div>
       </div>
 
-      {/* Status paket aktif */}
       {status?.active && !showPackages ? (
-        <Card className="border-primary/30 bg-primary/5">
-          <CardContent className="pt-4">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-full bg-primary/15 text-primary">
-                  <CheckCircle2 className="size-5" />
+        <Card className="bg-muted/50">
+          <CardContent>
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                  <CheckCircle2 className="size-5 text-green-500" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="font-medium text-sm">Paket aktif</p>
-                  <p className="text-xs text-muted-foreground flex items-center gap-2 mt-0.5">
-                    <span className="flex items-center gap-1"><FileStack className="size-3" /> {status.filesRemaining === 999 ? "Unlimited" : `${status.filesRemaining} / ${status.filesTotal} file tersisa`}</span>
-                    <span>·</span>
-                    <span className="flex items-center gap-1"><Clock className="size-3" /> {timeLeft(status.expiresAt)}</span>
-                  </p>
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1"><FileStack className="size-3 shrink-0" /> {status.filesRemaining === 999 ? "Unlimited" : `${status.filesRemaining} / ${status.filesTotal} file tersisa`}</span>
+                    <span className="hidden sm:inline">·</span>
+                    <span className="flex items-center gap-1"><Clock className="size-3 shrink-0" /> {timeLeft(status.expiresAt)}</span>
+                  </div>
                 </div>
               </div>
-              <Button size="sm" variant="outline" onClick={() => setShowPackages((v) => !v)}>
+              <Button size="sm" variant="outline" className="shrink-0" onClick={() => setShowPackages((v) => !v)}>
                 {showPackages ? "Tutup" : "Perpanjang"}
               </Button>
             </div>
           </CardContent>
         </Card>
       ) : (
-        /* Belum punya paket — tampilkan pilihan */
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <ShoppingBag className="size-4 text-muted-foreground" />
@@ -234,7 +231,6 @@ export default function DownloaderPage(_: { serviceId: "envato" }) {
         </div>
       )}
 
-      {/* Form download — hanya tampil kalau punya paket */}
       {status?.active && (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="flex flex-col gap-4 lg:col-span-2">
@@ -338,7 +334,6 @@ export default function DownloaderPage(_: { serviceId: "envato" }) {
         </div>
       )}
 
-      {/* Dialog konfirmasi beli paket */}
       <Dialog open={!!buyPkg} onOpenChange={(o) => { if (!o) { setBuyPkg(null); setBuyError("") } }}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
@@ -367,7 +362,7 @@ export default function DownloaderPage(_: { serviceId: "envato" }) {
           {credits < (selectedPkg?.price ?? 0) && (
             <p className="text-xs text-destructive">
               Saldo tidak cukup.{" "}
-              <Link to="/dashboard/topup" className="underline" onClick={() => setBuyPkg(null)}>Top up dulu</Link>
+              <Link to="/dashboard/topup" style={{ textDecoration: "none" }} onClick={() => setBuyPkg(null)}>Top up dulu</Link>
             </p>
           )}
           <DialogFooter>

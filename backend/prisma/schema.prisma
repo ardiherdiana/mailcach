@@ -11,7 +11,8 @@ model User {
   id        Int      @id @default(autoincrement())
   name      String   @db.VarChar(100)
   email     String   @unique @db.VarChar(255)
-  password  String   @db.VarChar(255)
+  password  String?  @db.VarChar(255)
+  googleId  String?  @unique @db.VarChar(255) @map("google_id")
   role      Role     @default(USER)
   credits   Int      @default(0)
   createdAt DateTime @default(now()) @map("created_at")
@@ -21,6 +22,7 @@ model User {
   createdVouchers Voucher[]           @relation("CreatedBy")
   redemptions     VoucherRedemption[]
   envatoAccess    EnvatoAccess[]
+  turnitinJobs    TurnitinJob[]
 
   @@map("users")
 }
@@ -92,6 +94,31 @@ model InboxEmail {
 
   @@index([recipient])
   @@map("inbox_emails")
+}
+
+model TurnitinJob {
+  id              Int              @id @default(autoincrement())
+  userId          Int              @map("user_id")
+  filename        String           @db.VarChar(255)
+  fileSizeBytes   Int              @map("file_size_bytes")
+  status          TurnitinStatus   @default(PENDING)
+  uploadPath      String           @db.VarChar(500) @map("upload_path")
+  resultPath      String?          @db.VarChar(500) @map("result_path")
+  similarityScore Int?             @map("similarity_score")
+  adminNote       String?          @db.VarChar(500) @map("admin_note")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("turnitin_jobs")
+}
+
+enum TurnitinStatus {
+  PENDING
+  COMPLETED
+  FAILED
 }
 
 model VoucherRedemption {

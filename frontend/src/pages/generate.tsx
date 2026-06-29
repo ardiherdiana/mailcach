@@ -129,7 +129,6 @@ export default function GeneratePage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="flex flex-col gap-4 lg:col-span-2">
-          {/* Script */}
           <Card>
             <CardHeader>
               <CardTitle className="text-sm">Script Narasi</CardTitle>
@@ -153,7 +152,6 @@ export default function GeneratePage() {
             </CardContent>
           </Card>
 
-          {/* Voice ID */}
           <Card>
             <CardHeader>
               <CardTitle className="text-sm">Voice ID</CardTitle>
@@ -179,7 +177,6 @@ export default function GeneratePage() {
                 disabled={state === "generating"}
               />
 
-              {/* Tutorial singkat */}
               <div className="rounded-lg bg-muted p-3 text-xs text-muted-foreground space-y-1.5">
                 <p className="font-medium text-foreground">Cara ambil Voice ID:</p>
                 <ol className="space-y-1 list-decimal list-inside">
@@ -193,7 +190,6 @@ export default function GeneratePage() {
           </Card>
         </div>
 
-        {/* Panel kanan */}
         <div className="flex flex-col gap-4">
           <Card>
             <CardHeader><CardTitle className="text-sm">Estimasi Kredit</CardTitle></CardHeader>
@@ -254,7 +250,6 @@ export default function GeneratePage() {
         </div>
       </div>
 
-      {/* Dialog preview */}
       <Dialog open={showPreviewDialog} onOpenChange={(o) => { if (!o) stopPreview(); setShowPreviewDialog(o) }}>
         <DialogContent className="max-w-md">
           <DialogHeader>

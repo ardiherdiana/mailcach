@@ -6,6 +6,7 @@ import ProtectedRoute from "@/components/protected-route"
 import AdminRoute from "@/components/admin-route"
 import LoginPage from "@/pages/login"
 import RegisterPage from "@/pages/register"
+import ForgotPasswordPage from "@/pages/forgot-password"
 import DashboardLayout from "@/pages/dashboard-layout"
 import DashboardPage from "@/pages/dashboard"
 import GeneratePage from "@/pages/generate"
@@ -15,7 +16,12 @@ import TopUpPage from "@/pages/topup"
 import AdminUsersPage from "@/pages/admin/users"
 import AdminVouchersPage from "@/pages/admin/vouchers"
 import AdminEnvatoSessionPage from "@/pages/admin/envato-session"
+import AdminTurnitinJobsPage from "@/pages/admin/turnitin-jobs"
 import InboxPage from "@/pages/inbox"
+import TurnitinPage from "@/pages/turnitin"
+import ProfilePage from "@/pages/profile"
+import ChangeEmailPage from "@/pages/change-email"
+import ChangePasswordPage from "@/pages/change-password"
 
 export default function App() {
   return (
@@ -25,6 +31,7 @@ export default function App() {
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route
               path="/dashboard"
               element={
@@ -37,8 +44,12 @@ export default function App() {
               <Route path="generate" element={<GeneratePage />} />
               <Route path="envato" element={<DownloaderPage serviceId="envato" />} />
               <Route path="inbox" element={<InboxPage />} />
+              <Route path="turnitin" element={<TurnitinPage />} />
               <Route path="history" element={<HistoryPage />} />
               <Route path="topup" element={<TopUpPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="profile/change-email" element={<ChangeEmailPage />} />
+              <Route path="profile/change-password" element={<ChangePasswordPage />} />
               <Route
                 path="admin/users"
                 element={<AdminRoute><AdminUsersPage /></AdminRoute>}
@@ -50,6 +61,10 @@ export default function App() {
               <Route
                 path="admin/envato-session"
                 element={<AdminRoute><AdminEnvatoSessionPage /></AdminRoute>}
+              />
+              <Route
+                path="admin/turnitin"
+                element={<AdminRoute><AdminTurnitinJobsPage /></AdminRoute>}
               />
             </Route>
             <Route path="*" element={<Navigate to="/login" replace />} />

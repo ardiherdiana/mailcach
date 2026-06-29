@@ -1,4 +1,5 @@
-import { LayoutDashboard, LogOut, Mic, History, CreditCard, FolderDown, Users, Ticket, Wallet, Cookie, AlertCircle, ChevronRight, Layers, Mail } from "lucide-react"
+import { LayoutDashboard, LogOut, Mic, History, CreditCard, FolderDown, Users, Ticket, Wallet, Cookie, AlertCircle, ChevronRight, Layers, Mail, ShieldAlert, UserCircle } from "lucide-react"
+import { MailcachLogo } from "@/components/logo"
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
 
@@ -30,11 +31,13 @@ const navItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard", exact: true },
   { to: "/dashboard/history", icon: History, label: "Riwayat" },
   { to: "/dashboard/topup", icon: CreditCard, label: "Top Up" },
+  { to: "/dashboard/profile", icon: UserCircle, label: "Profil" },
 ]
 
 const serviceItems = [
-  { to: "/dashboard/generate", icon: Mic, label: "ElevenLabs" },
   { to: "/dashboard/envato", icon: FolderDown, label: "Envato" },
+  { to: "/dashboard/turnitin", icon: ShieldAlert, label: "Turnitin" },
+  { to: "/dashboard/generate", icon: Mic, label: "ElevenLabs" },
   { to: "/dashboard/inbox", icon: Mail, label: "Email Inbox" },
 ]
 
@@ -42,29 +45,30 @@ const adminItems = [
   { to: "/dashboard/admin/users", icon: Users, label: "Manajemen User" },
   { to: "/dashboard/admin/vouchers", icon: Ticket, label: "Voucher" },
   { to: "/dashboard/admin/envato-session", icon: Cookie, label: "Envato Session" },
+  { to: "/dashboard/admin/turnitin", icon: ShieldAlert, label: "Turnitin Jobs" },
 ]
 
-function useEnvatoSessionStatus() {
+function useSessionWarnings() {
   const { isAdmin } = useAuth()
-  const [warn, setWarn] = useState(false)
+  const [envatoWarn, setEnvatoWarn] = useState(false)
 
   useEffect(() => {
     if (!isAdmin) return
     import("@/lib/api").then(({ api }) =>
       api.admin.envatoSession.get()
-        .then((s) => setWarn(!s.active))
-        .catch(() => setWarn(true))
+        .then((s) => setEnvatoWarn(!s.active))
+        .catch(() => setEnvatoWarn(true))
     )
   }, [isAdmin])
 
-  return warn
+  return { envatoWarn }
 }
 
 function AppSidebar() {
   const { pathname } = useLocation()
   const { user, logout, isAdmin } = useAuth()
   const navigate = useNavigate()
-  const envatoWarn = useEnvatoSessionStatus()
+  const { envatoWarn } = useSessionWarnings()
 
   function handleLogout() {
     logout()
@@ -79,13 +83,11 @@ function AppSidebar() {
             <SidebarMenuButton size="lg" asChild>
               <Link to="/dashboard">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <svg viewBox="0 0 24 24" className="size-4 fill-current">
-                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                  </svg>
+                  <MailcachLogo className="size-4" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-semibold">Mailcach</span>
-                  <span className="text-xs text-sidebar-foreground/60">v1.0.0</span>
+                  <span className="text-xs text-sidebar-foreground/60">Panel Digital</span>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -97,14 +99,12 @@ function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarMenu>
-            {/* Dashboard */}
             <SidebarMenuItem>
               <SidebarMenuButton asChild isActive={pathname === "/dashboard"} tooltip="Dashboard">
                 <Link to="/dashboard"><LayoutDashboard /><span>Dashboard</span></Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
 
-            {/* Layanan collapsible */}
             {(() => {
               const isServiceActive = serviceItems.some(({ to }) => pathname.startsWith(to))
               return (
@@ -133,7 +133,6 @@ function AppSidebar() {
               )
             })()}
 
-            {/* Riwayat & Top Up */}
             {navItems.slice(1).map(({ to, icon: Icon, label }) => (
               <SidebarMenuItem key={to}>
                 <SidebarMenuButton asChild isActive={pathname.startsWith(to)} tooltip={label}>
@@ -209,7 +208,12 @@ const PAGE_TITLES: Record<string, string> = {
   "/dashboard/admin/users": "Manajemen User",
   "/dashboard/admin/vouchers": "Voucher Redeem",
   "/dashboard/admin/envato-session": "Envato Session",
+  "/dashboard/admin/turnitin": "Turnitin Jobs",
   "/dashboard/inbox": "Email Inbox",
+  "/dashboard/turnitin": "Cek Plagiarisme",
+  "/dashboard/profile": "Profil Saya",
+  "/dashboard/profile/change-email": "Ganti Email",
+  "/dashboard/profile/change-password": "Ganti Password",
 }
 
 function TopbarBalance() {
@@ -234,7 +238,7 @@ export default function DashboardLayout() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className="overflow-x-hidden">
         <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mr-2 h-4" />

@@ -52,7 +52,7 @@ router.post("/login", async (req, res) => {
   }
 
   const user = await prisma.user.findUnique({ where: { email } })
-  if (!user || !(await bcrypt.compare(password, user.password))) {
+  if (!user || !user.password || !(await bcrypt.compare(password, user.password))) {
     res.status(401).json({ error: "Email atau password salah" })
     return
   }

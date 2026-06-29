@@ -13,8 +13,8 @@ export interface PuppeteerCookie {
 }
 
 export interface EnvatoSession {
-  cookies: string              // header string untuk fetch biasa
-  rawCookies: PuppeteerCookie[] // structured untuk Puppeteer
+  cookies: string
+  rawCookies: PuppeteerCookie[]
   userAgent: string
   updatedAt: string
   note?: string
@@ -29,10 +29,8 @@ export function loadSession(): EnvatoSession | null {
   }
 }
 
-// Konversi Netscape cookie format → header string + structured cookies
 export function parseNetscapeCookies(raw: string): { header: string; cookies: PuppeteerCookie[] } {
   if (!raw.trim().startsWith("#")) {
-    // Sudah header string — tidak bisa dapat structured cookies
     return { header: raw.trim(), cookies: [] }
   }
 

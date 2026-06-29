@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react"
-import { Mic, ArrowRight, FolderDown, History, CreditCard, Loader2, TrendingDown, TrendingUp, Layers } from "lucide-react"
+import { Mic, ArrowRight, FolderDown, Loader2, TrendingDown, TrendingUp, Layers, Inbox, ShieldAlert } from "lucide-react"
 import { Link } from "react-router-dom"
 
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useAuth } from "@/contexts/auth-context"
@@ -12,24 +11,48 @@ import { api, type Transaction } from "@/lib/api"
 
 const services = [
   {
-    to: "/dashboard/generate",
-    icon: Mic,
-    label: "ElevenLabs",
-    description: "Ubah script narasi jadi audio AI berkualitas tinggi",
-    badge: "Voice",
-    badgeClass: "bg-violet-500/15 text-violet-600 dark:text-violet-400",
-    iconClass: "bg-violet-500/15 text-violet-600 dark:text-violet-400",
-    priceNote: "Rp 5 / karakter",
-  },
-  {
     to: "/dashboard/envato",
     icon: FolderDown,
     label: "Envato Elements",
-    description: "Download template, musik, font, dan aset kreatif premium",
+    description: "Download template, musik, font, dan ribuan aset kreatif dari Envato Elements dengan harga per-file tanpa subscribe bulanan.",
     badge: "Download",
     badgeClass: "bg-green-500/15 text-green-600 dark:text-green-400",
     iconClass: "bg-green-500/15 text-green-600 dark:text-green-400",
-    priceNote: "Rp 2.000 / file",
+    priceNote: "Rp 1.000 / file",
+    bestSeller: true,
+  },
+  {
+    to: "/dashboard/turnitin",
+    icon: ShieldAlert,
+    label: "Turnitin",
+    description: "Cek tingkat plagiarisme dokumen kamu via Turnitin. Upload file, tim kami proses dan laporan similarity siap diunduh.",
+    badge: "Plagiarisme",
+    badgeClass: "bg-green-500/15 text-green-600 dark:text-green-400",
+    iconClass: "bg-green-500/15 text-green-600 dark:text-green-400",
+    priceNote: "Rp 10.000 / dokumen",
+    bestSeller: true,
+  },
+  {
+    to: "/dashboard/generate",
+    icon: Mic,
+    label: "ElevenLabs",
+    description: "Generate voice over narasi berkualitas studio pakai AI ElevenLabs dengan ratusan pilihan suara, bayar per karakter sesuai panjang teks.",
+    badge: "Voice",
+    badgeClass: "bg-green-500/15 text-green-600 dark:text-green-400",
+    iconClass: "bg-green-500/15 text-green-600 dark:text-green-400",
+    priceNote: "Rp 5 / karakter",
+    bestSeller: false,
+  },
+  {
+    to: "/dashboard/inbox",
+    icon: Inbox,
+    label: "Email Inbox",
+    description: "Terima dan cari email masuk di domain platform secara instan, sangat berguna untuk verifikasi akun, registrasi, dan kode OTP.",
+    badge: "Inbox",
+    badgeClass: "bg-green-500/15 text-green-600 dark:text-green-400",
+    iconClass: "bg-green-500/15 text-green-600 dark:text-green-400",
+    priceNote: "Rp 10 / pencarian",
+    bestSeller: false,
   },
 ]
 
@@ -56,57 +79,60 @@ export default function DashboardPage() {
 
       <div>
         <h2 className="font-heading text-lg font-semibold">Halo, {user?.name?.split(" ")[0]} 👋</h2>
-        <p className="text-sm text-muted-foreground">Mau pakai layanan apa hari ini?</p>
+        <p className="text-sm text-muted-foreground">Akses layanan AI & aset kreatif premium dengan satu akun.</p>
       </div>
 
-      {/* Stats row */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Card size="sm">
+        <Card size="sm" className="">
           <CardHeader className="pb-1">
-            <CardDescription className="flex items-center gap-1"><TrendingDown className="size-3" /> Total Pengeluaran</CardDescription>
-            <CardTitle className="text-xl tabular-nums">
-              {loading ? <Loader2 className="size-4 animate-spin text-muted-foreground" /> : `Rp ${totalSpent.toLocaleString("id-ID")}`}
+            <CardDescription className="flex items-center gap-1 text-green-700 dark:text-green-400"><TrendingDown className="size-3" /> Total Pengeluaran</CardDescription>
+            <CardTitle className="text-xl tabular-nums text-green-700 dark:text-green-300">
+              {loading ? <Loader2 className="size-4 animate-spin" /> : `Rp ${totalSpent.toLocaleString("id-ID")}`}
             </CardTitle>
           </CardHeader>
         </Card>
-        <Card size="sm">
+        <Card size="sm" className="">
           <CardHeader className="pb-1">
-            <CardDescription className="flex items-center gap-1"><TrendingUp className="size-3" /> Total Top Up</CardDescription>
-            <CardTitle className="text-xl tabular-nums">
-              {loading ? <Loader2 className="size-4 animate-spin text-muted-foreground" /> : `Rp ${totalTopup.toLocaleString("id-ID")}`}
+            <CardDescription className="flex items-center gap-1 text-green-700 dark:text-green-400"><TrendingUp className="size-3" /> Total Top Up</CardDescription>
+            <CardTitle className="text-xl tabular-nums text-green-700 dark:text-green-300">
+              {loading ? <Loader2 className="size-4 animate-spin" /> : `Rp ${totalTopup.toLocaleString("id-ID")}`}
             </CardTitle>
           </CardHeader>
         </Card>
-        <Card size="sm">
+        <Card size="sm" className="">
           <CardHeader className="pb-1">
-            <CardDescription className="flex items-center gap-1"><Layers className="size-3" /> Transaksi</CardDescription>
-            <CardTitle className="text-xl tabular-nums">
-              {loading ? <Loader2 className="size-4 animate-spin text-muted-foreground" /> : txns.length}
+            <CardDescription className="flex items-center gap-1 text-green-700 dark:text-green-400"><Layers className="size-3" /> Transaksi</CardDescription>
+            <CardTitle className="text-xl tabular-nums text-green-700 dark:text-green-300">
+              {loading ? <Loader2 className="size-4 animate-spin" /> : txns.length}
             </CardTitle>
           </CardHeader>
         </Card>
-        <Card size="sm">
+        <Card size="sm" className="">
           <CardHeader className="pb-1">
-            <CardDescription className="flex items-center gap-1"><Mic className="size-3" /> Layanan Dipakai</CardDescription>
-            <CardTitle className="text-xl tabular-nums">
-              {loading ? <Loader2 className="size-4 animate-spin text-muted-foreground" /> : uniqueServices}
+            <CardDescription className="flex items-center gap-1 text-green-700 dark:text-green-400"><Mic className="size-3" /> Layanan Dipakai</CardDescription>
+            <CardTitle className="text-xl tabular-nums text-green-700 dark:text-green-300">
+              {loading ? <Loader2 className="size-4 animate-spin" /> : uniqueServices}
             </CardTitle>
           </CardHeader>
         </Card>
       </div>
 
-      <div>
-        <h3 className="mb-3 text-sm font-medium text-muted-foreground">Layanan</h3>
+      <div className="flex flex-col gap-4">
+        <h3 className="text-sm font-medium text-muted-foreground">Layanan</h3>
+
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {services.map(({ to, icon: Icon, label, description, badge, badgeClass, iconClass, priceNote }) => (
+          {services.map(({ to, icon: Icon, label, description, badge, badgeClass, iconClass, priceNote, bestSeller }) => (
             <Link key={to} to={to}>
-              <Card className="h-full transition-shadow hover:shadow-md">
-                <CardHeader className="pb-2">
+              <Card className="flex h-full flex-col transition-shadow hover:shadow-md">
+                <CardHeader className="flex-1 pb-2">
                   <div className="flex items-start justify-between">
                     <div className={`flex size-9 items-center justify-center rounded-lg ${iconClass}`}>
                       <Icon className="size-4" />
                     </div>
-                    <Badge variant="secondary" className={`text-xs ${badgeClass}`}>{badge}</Badge>
+                    <div className="flex items-center gap-2">
+                      {bestSeller && <Badge className="text-xs bg-amber-500/15 text-amber-600 dark:text-amber-400 border-0">⭐ Best Seller</Badge>}
+                      <Badge variant="secondary" className={`text-xs ${badgeClass}`}>{badge}</Badge>
+                    </div>
                   </div>
                   <CardTitle className="text-sm font-medium">{label}</CardTitle>
                   <CardDescription className="text-xs">{description}</CardDescription>
@@ -121,14 +147,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-<div className="flex gap-2">
-        <Button variant="outline" size="sm" asChild>
-          <Link to="/dashboard/history"><History className="size-4" /> Riwayat</Link>
-        </Button>
-        <Button variant="outline" size="sm" asChild>
-          <Link to="/dashboard/topup"><CreditCard className="size-4" /> Top Up Kredit</Link>
-        </Button>
-      </div>
     </div>
   )
 }

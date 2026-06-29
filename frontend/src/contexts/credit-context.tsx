@@ -25,18 +25,17 @@ export function CreditProvider({ children }: { children: ReactNode }) {
     try {
       const me = await api.me.get()
       setCredits(me.credits)
-      if (user) setUser({ ...user, credits: me.credits })
+      if (user) setUser({ ...user, credits: me.credits, hasPassword: me.hasPassword, isGoogleLinked: me.isGoogleLinked })
     } catch {
-      // silently fail
     } finally {
       setLoading(false)
     }
-  }, [isAuthenticated]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isAuthenticated])
 
   useEffect(() => {
     if (isAuthenticated) refresh()
     else setCredits(0)
-  }, [isAuthenticated]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isAuthenticated])
 
   return (
     <CreditContext.Provider value={{ credits, loading, refresh, setCredits, isLowCredit: credits < CREDIT_WARNING_THRESHOLD }}>

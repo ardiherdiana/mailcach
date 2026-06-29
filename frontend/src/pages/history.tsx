@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Download, Mic, FolderDown, Loader2, Ticket } from "lucide-react"
+import { Download, Mic, FolderDown, Loader2, Ticket, ShieldAlert, Mail } from "lucide-react"
 import { Link } from "react-router-dom"
 
 import { Badge } from "@/components/ui/badge"
@@ -16,6 +16,8 @@ const SERVICE_META: Record<string, { label: string; icon: typeof Mic; badgeClass
   elevenlabs: { label: "ElevenLabs", icon: Mic, badgeClass: "bg-violet-500/15 text-violet-600 dark:text-violet-400" },
   envato: { label: "Envato", icon: FolderDown, badgeClass: "bg-green-500/15 text-green-600 dark:text-green-400" },
   voucher: { label: "Voucher", icon: Ticket, badgeClass: "bg-blue-500/15 text-blue-600 dark:text-blue-400" },
+  turnitin: { label: "Turnitin", icon: ShieldAlert, badgeClass: "bg-orange-500/15 text-orange-600 dark:text-orange-400" },
+  inbox: { label: "Inbox", icon: Mail, badgeClass: "bg-sky-500/15 text-sky-600 dark:text-sky-400" },
 }
 
 export default function HistoryPage() {
@@ -58,50 +60,82 @@ export default function HistoryPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-sm">Semua Transaksi</CardTitle>
-          <CardDescription>ElevenLabs · Envato Elements · Voucher</CardDescription>
+          <CardDescription>ElevenLabs · Envato Elements · Turnitin · Inbox · Voucher</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Layanan</TableHead>
-                <TableHead>Deskripsi</TableHead>
-                <TableHead>Tipe</TableHead>
-                <TableHead className="text-right">Jumlah</TableHead>
-                <TableHead>Tanggal</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {transactions.map((tx) => {
-                const meta = SERVICE_META[tx.service] ?? { label: tx.service, icon: Download, badgeClass: "" }
-                const Icon = meta.icon
-                return (
-                  <TableRow key={tx.id}>
-                    <TableCell>
-                      <Badge variant="secondary" className={`gap-1 text-xs ${meta.badgeClass}`}>
-                        <Icon className="size-3" />
-                        {meta.label}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="max-w-[220px]">
-                      <p className="truncate text-sm">{tx.description ?? "—"}</p>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={tx.type === "CREDIT" ? "default" : "secondary"} className="text-xs">
-                        {tx.type === "CREDIT" ? "+ Kredit" : "- Kredit"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className={`text-right tabular-nums text-sm font-medium ${tx.type === "CREDIT" ? "text-primary" : ""}`}>
-                      {tx.type === "CREDIT" ? "+" : "-"}Rp {tx.amount.toLocaleString("id-ID")}
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
-                      {formatDate(tx.createdAt)}
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
+          {/* Desktop: tabel */}
+          <div className="hidden sm:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Layanan</TableHead>
+                  <TableHead>Deskripsi</TableHead>
+                  <TableHead>Tipe</TableHead>
+                  <TableHead className="text-right">Jumlah</TableHead>
+                  <TableHead>Tanggal</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {transactions.map((tx) => {
+                  const meta = SERVICE_META[tx.service] ?? { label: tx.service, icon: Download, badgeClass: "" }
+                  const Icon = meta.icon
+                  return (
+                    <TableRow key={tx.id}>
+                      <TableCell>
+                        <Badge variant="secondary" className={`gap-1 text-xs ${meta.badgeClass}`}>
+                          <Icon className="size-3" />
+                          {meta.label}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="max-w-[220px]">
+                        <p className="truncate text-sm">{tx.description ?? "—"}</p>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={tx.type === "CREDIT" ? "default" : "secondary"} className="text-xs">
+                          {tx.type === "CREDIT" ? "+ Kredit" : "- Kredit"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className={`text-right tabular-nums text-sm font-medium ${tx.type === "CREDIT" ? "text-primary" : ""}`}>
+                        {tx.type === "CREDIT" ? "+" : "-"}Rp {tx.amount.toLocaleString("id-ID")}
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                        {formatDate(tx.createdAt)}
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Mobile: list card */}
+          <div className="flex flex-col divide-y sm:hidden">
+            {transactions.map((tx) => {
+              const meta = SERVICE_META[tx.service] ?? { label: tx.service, icon: Download, badgeClass: "" }
+              const Icon = meta.icon
+              return (
+                <div key={tx.id} className="flex items-start justify-between gap-3 px-4 py-3">
+                  <div className="flex items-start gap-3 min-w-0">
+                    <div className={`flex size-8 shrink-0 items-center justify-center rounded-full ${meta.badgeClass} bg-opacity-100`}>
+                      <Icon className="size-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{tx.description ?? meta.label}</p>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <Badge variant="secondary" className={`gap-1 text-xs px-1.5 py-0 h-4 ${meta.badgeClass}`}>
+                          {meta.label}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">{formatDate(tx.createdAt)}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span className={`shrink-0 text-sm font-semibold tabular-nums ${tx.type === "CREDIT" ? "text-primary" : ""}`}>
+                    {tx.type === "CREDIT" ? "+" : "-"}Rp {tx.amount.toLocaleString("id-ID")}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
         </CardContent>
       </Card>
     </div>

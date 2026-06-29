@@ -35,7 +35,6 @@ router.delete("/", (_req, res) => {
   res.json({ active: false })
 })
 
-// Test apakah bisa download tanpa proxy/Puppeteer
 router.get("/debug-no-proxy", async (req, res) => {
   const { url } = req.query as { url?: string }
   if (!url) { res.status(400).json({ error: "url query param wajib" }); return }
@@ -44,7 +43,6 @@ router.get("/debug-no-proxy", async (req, res) => {
   if (!session) { res.status(503).json({ error: "Session belum diset" }); return }
 
   try {
-    // Extract item code dari URL
     const itemCodeMatch = url.match(/[-\/]([A-Z0-9]{5,8})(?:\?|$)/i)
     const itemCode = itemCodeMatch?.[1] ?? ""
 
@@ -55,7 +53,6 @@ router.get("/debug-no-proxy", async (req, res) => {
       "Referer": "https://elements.envato.com",
     }
 
-    // Step 1: Get UUID via neue-download
     const ndUrl = `https://elements.envato.com/data-api/modal/neue-download?type=neue-download&itemId=${itemCode}&languageCode=en`
     const ndRes = await fetch(ndUrl, { headers })
     const ndJson = await ndRes.json() as any
@@ -66,7 +63,6 @@ router.get("/debug-no-proxy", async (req, res) => {
       res.json({ step: "neue-download", status: ndRes.status, response: ndJson }); return
     }
 
-    // Step 2: Get download URL dari app.envato.com
     const dlUrl = `https://app.envato.com/download.data?itemUuid=${itemUuid}&itemType=${itemType}&_routes=routes%2Fdownload%2Froute`
     const dlRes = await fetch(dlUrl, {
       headers: { ...headers, "Referer": `https://app.envato.com/${itemType}/${itemUuid}` }
@@ -82,7 +78,6 @@ router.get("/debug-no-proxy", async (req, res) => {
   }
 })
 
-// Debug: lihat __NEXT_DATA__ dari halaman aset tanpa potong kuota
 router.get("/debug-asset", async (req, res) => {
   const { url } = req.query as { url?: string }
   if (!url) { res.status(400).json({ error: "url query param wajib diisi" }); return }

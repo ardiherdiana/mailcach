@@ -8,7 +8,7 @@ export interface DownloadService {
   acceptedDomains: string[]
   exampleUrl: string
   fileTypes: string[]
-  creditsPerDownload: number // 1 kredit = Rp 1
+  creditsPerDownload: number
 }
 
 export const DOWNLOAD_SERVICES: DownloadService[] = [

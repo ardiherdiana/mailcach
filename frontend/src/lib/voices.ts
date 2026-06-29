@@ -17,13 +17,11 @@ export const VOICES: Voice[] = [
 
 export const CHARS_PER_PREVIEW = 200
 
-// 1 kredit = Rp 1
-// ElevenLabs: modal Rp 3/char, jual Rp 5/char → 5 kredit/karakter
 export const CREDITS_PER_CHAR = 5
 
 export const TOPUP_PACKAGES = [
   { id: "10k",  price: 10_000,  credits: 10_000 },
-  { id: "25k",  price: 25_000,  credits: 27_500 },  // +10% bonus
-  { id: "50k",  price: 50_000,  credits: 60_000 },  // +20% bonus
-  { id: "100k", price: 100_000, credits: 130_000 }, // +30% bonus
+  { id: "25k",  price: 25_000,  credits: 27_500 },
+  { id: "50k",  price: 50_000,  credits: 60_000 },
+  { id: "100k", price: 100_000, credits: 130_000 },
 ]

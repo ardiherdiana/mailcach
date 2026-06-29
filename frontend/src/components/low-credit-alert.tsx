@@ -18,7 +18,7 @@ export function LowCreditAlert() {
           peringatan Rp {CREDIT_WARNING_THRESHOLD.toLocaleString("id-ID")}).
         </span>
         <Button size="sm" variant="outline" className="shrink-0 border-amber-500/40 hover:bg-amber-500/10" asChild>
-          <Link to="/dashboard/topup">Top Up Sekarang</Link>
+          <Link to="/dashboard/topup" className="no-underline" style={{ textDecoration: "none" }}>Top Up Sekarang</Link>
         </Button>
       </AlertDescription>
     </Alert>

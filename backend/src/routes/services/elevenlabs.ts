@@ -69,7 +69,6 @@ router.post("/generate", async (req: AuthRequest, res) => {
           audioUrl = `data:audio/mpeg;base64,${Buffer.from(buf).toString("base64")}`
         }
       } catch {
-        // audio gagal tapi kredit sudah dipotong — tetap return success
       }
     }
 

@@ -4,6 +4,7 @@ import { api, type AuthUser } from "@/lib/api"
 import { useAuth } from "@/contexts/auth-context"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 
@@ -48,70 +49,76 @@ export default function AdminUsersPage() {
   if (error) return <p className="p-6 text-destructive">{error}</p>
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="flex flex-1 flex-col gap-6 p-6">
       <div>
-        <h1 className="text-2xl font-bold">Manajemen User</h1>
-        <p className="text-muted-foreground text-sm">Total {users.length} user terdaftar</p>
+        <h2 className="font-heading text-lg font-semibold">Manajemen User</h2>
+        <p className="text-sm text-muted-foreground">Total {users.length} user terdaftar</p>
       </div>
 
-      <div className="rounded-lg border overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nama</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead className="text-right">Saldo</TableHead>
-              <TableHead className="text-right">Aksi</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.map((u) => (
-              <TableRow key={u.id}>
-                <TableCell className="font-medium">{u.name}</TableCell>
-                <TableCell className="text-muted-foreground">{u.email}</TableCell>
-                <TableCell>
-                  <Badge variant={u.role === "ADMIN" ? "default" : "secondary"}>{u.role}</Badge>
-                </TableCell>
-                <TableCell className="text-right font-mono">
-                  Rp {u.credits.toLocaleString("id-ID")}
-                </TableCell>
-                <TableCell className="text-right">
-                  {u.id !== me?.id && (
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => toggleRole(u)}
-                        title={u.role === "ADMIN" ? "Turunkan ke User" : "Jadikan Admin"}
-                      >
-                        {u.role === "ADMIN" ? <ShieldOff className="size-4" /> : <ShieldCheck className="size-4" />}
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button size="sm" variant="destructive"><Trash2 className="size-4" /></Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Hapus user {u.name}?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Semua data user ini akan dihapus permanen dan tidak bisa dikembalikan.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Batal</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => deleteUser(u.id)} className="bg-destructive text-white">Hapus</AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  )}
-                </TableCell>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm">Daftar User</CardTitle>
+          <CardDescription>Kelola role dan hapus akun pengguna.</CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nama</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead className="text-right">Saldo</TableHead>
+                <TableHead className="text-right">Aksi</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+            </TableHeader>
+            <TableBody>
+              {users.map((u) => (
+                <TableRow key={u.id}>
+                  <TableCell className="font-medium">{u.name}</TableCell>
+                  <TableCell className="text-muted-foreground">{u.email}</TableCell>
+                  <TableCell>
+                    <Badge variant={u.role === "ADMIN" ? "default" : "secondary"}>{u.role}</Badge>
+                  </TableCell>
+                  <TableCell className="text-right font-mono">
+                    Rp {u.credits.toLocaleString("id-ID")}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {u.id !== me?.id && (
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => toggleRole(u)}
+                          title={u.role === "ADMIN" ? "Turunkan ke User" : "Jadikan Admin"}
+                        >
+                          {u.role === "ADMIN" ? <ShieldOff className="size-4" /> : <ShieldCheck className="size-4" />}
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button size="sm" variant="destructive"><Trash2 className="size-4" /></Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Hapus user {u.name}?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Semua data user ini akan dihapus permanen dan tidak bisa dikembalikan.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Batal</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => deleteUser(u.id)} className="bg-destructive text-white">Hapus</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   )
 }

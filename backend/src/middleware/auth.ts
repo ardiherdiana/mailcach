@@ -8,11 +8,14 @@ export interface AuthRequest extends Request {
 
 export function authenticate(req: AuthRequest, res: Response, next: NextFunction) {
   const header = req.headers.authorization
-  if (!header?.startsWith("Bearer ")) {
+  // Support token via query param for direct download links
+  const queryToken = req.query.token as string | undefined
+  const rawToken = header?.startsWith("Bearer ") ? header.slice(7) : queryToken
+  if (!rawToken) {
     res.status(401).json({ error: "Token tidak ditemukan" })
     return
   }
-  const token = header.slice(7)
+  const token = rawToken
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET!) as unknown as {
       sub: number

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { CheckCircle2, AlertCircle, Loader2, Trash2, RefreshCw, Cookie } from "lucide-react"
+import { CheckCircle2, AlertCircle, Loader2, Trash2, RefreshCw } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -48,7 +48,7 @@ export default function AdminEnvatoSessionPage() {
     try {
       await api.admin.envatoSession.clear()
       await load()
-    } catch { /* ignore */ }
+    } catch {}
   }
 
   return (
@@ -58,7 +58,6 @@ export default function AdminEnvatoSessionPage() {
         <p className="text-sm text-muted-foreground">Kelola cookies sesi Envato Elements untuk proses download otomatis.</p>
       </div>
 
-      {/* Status saat ini */}
       <Card>
         <CardHeader><CardTitle className="text-sm">Status Session</CardTitle></CardHeader>
         <CardContent>
@@ -97,32 +96,6 @@ export default function AdminEnvatoSessionPage() {
         </CardContent>
       </Card>
 
-      {/* Cara ambil cookies */}
-      <Card className="bg-muted/40">
-        <CardHeader>
-          <CardTitle className="text-sm flex items-center gap-2"><Cookie className="size-4" /> Cara Ambil Cookies</CardTitle>
-          <CardDescription>Ikuti langkah ini di browser tempat kamu login ke Envato Elements</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ol className="flex flex-col gap-2 text-sm">
-            {[
-              <>Buka <a href="https://elements.envato.com" target="_blank" rel="noreferrer" className="underline text-primary">elements.envato.com</a> dan pastikan sudah login</>,
-              <>Tekan <kbd className="rounded border px-1.5 py-0.5 text-xs font-mono bg-background">F12</kbd> untuk buka DevTools</>,
-              <>Buka tab <strong>Application</strong> → <strong>Cookies</strong> → klik <code className="text-xs bg-background rounded px-1">https://elements.envato.com</code></>,
-              <>Pilih semua cookies (<kbd className="rounded border px-1.5 py-0.5 text-xs font-mono bg-background">Ctrl+A</kbd>), klik kanan → <strong>Copy all as fetch</strong>, atau gunakan ekstensi <strong>Cookie-Editor</strong> untuk export sebagai string</>,
-              <>Atau: buka tab <strong>Network</strong>, refresh halaman, klik request mana saja, cari header <code className="text-xs bg-background rounded px-1">Cookie:</code> di bagian Request Headers, copy nilainya</>,
-              <strong className="text-amber-600">Paste di form di bawah ini. Jangan share cookies ke siapapun!</strong>,
-            ].map((step, i) => (
-              <li key={i} className="flex gap-2.5">
-                <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-muted-foreground/20 text-[11px] font-bold mt-0.5">{i + 1}</span>
-                <span className="text-muted-foreground">{step}</span>
-              </li>
-            ))}
-          </ol>
-        </CardContent>
-      </Card>
-
-      {/* Form input cookies */}
       <Card>
         <CardHeader>
           <CardTitle className="text-sm flex items-center gap-2">
